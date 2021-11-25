@@ -17,7 +17,7 @@ spec:
       app.kubernetes.io/instance: {{ .Release.Name }}
       tier: microblog
   template:
-    metadata:      
+    metadata:
       labels:
         app.kubernetes.io/name: {{ include "microblog.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
@@ -43,7 +43,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "microblog.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.microblog.podSecurityContext | nindent 8 }}
       containers:
@@ -67,21 +66,9 @@ spec:
               port: http
           {{- end  }}
           env:
-            {{- if .Values.external.enabled }}
-            - name: DATABASE_URL
-              value: {{ .Values.external.databaseHost | quote }}
-            - name: DATABASE_PORT
-              value: {{ .Values.external.databasePort | quote }}
-            - name: DATABASE_NAME
-              value: {{ .Values.external.databaseName | quote }}
-            - name: DATABASE_USER
-              value: {{ .Values.external.databaseUser | quote }}
-            - name: DATABASE_PASSWORD
-              value: {{ .Values.external.databasePassword | quote }}
-            {{- else if .Values.mysql.enabled }}
             - name: DATABASE_URL
               value: {{ include "microblog.databaseHost" . | quote }}
-            - name: DATABASE_PORT_NUMBER
+            - name: DATABASE_PORT
               value: {{ include "microblog.databasePort" . | quote }}
             - name: DATABASE_NAME
               value: {{ include "microblog.databaseName" . | quote }}
@@ -92,35 +79,34 @@ spec:
                 secretKeyRef:
                   name: {{ include "microblog.databaseSecretName" . }}
                   key: {{ include "microblog.databasePasswordKey" . | quote }}
-            {{- end }}
-            {{- if .Values.redis.enabled }}
             - name: REDIS_URL
               value: {{ include "microblog.redisHost" . | quote }}
             - name: REDIS_PORT
-              value: {{ .Values.external.redisPort | quote }}
+              value: {{ include "microblog.redisPort" . | quote }}
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "microblog.redisSecretName" . }}
                   key: {{ include "microblog.redisPasswordKey" . | quote }}
-            {{- end }}
             - name: ELASTICSEARCH_URL
-              value: {{ include "microblog.elasticsearchHost" . | quote }}
+              value: {{ .Values.external_elasticsearch.elasticsearchHost | quote }}
+            - name: ELASTICSEARCH_PORT
+              value: {{ .Values.external_elasticsearch.elasticsearchPort | quote }}
             - name: MICROBLOG_EMAIL
               value: {{ .Values.Email | quote }}
-            {{- if .Values.microblog.smtpHost }}
+            {{- if .Values.smtp.smtpHost }}
             - name: SMTP_HOST
-              value: {{ .Values.microblog.smtpHost | quote }}
+              value: {{ .Values.smtp.smtpHost | quote }}
             {{- end }}
-            {{- if .Values.microblog.smtpPort }}
+            {{- if .Values.smtp.smtpPort }}
             - name: SMTP_PORT
-              value: {{ .Values.microblog.smtpPort | quote }}
+              value: {{ .Values.smtp.smtpPort | quote }}
             {{- end }}
-            {{- if .Values.microblog.smtpUser }}
+            {{- if .Values.smtp.smtpUser }}
             - name: SMTP_USER
-              value: {{ .Values.microblog.smtpUser | quote }}
+              value: {{ .Values.smtp.smtpUser | quote }}
             {{- end }}
-            {{- if .Values.microblog.smtpPassword }}
+            {{- if .Values.smtp.smtpPassword }}
             - name: SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -133,4 +119,4 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.microblog.resources | nindent 12 }}
-      
+

@@ -31,37 +31,18 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
+Return the proper Storage Class
 */}}
-{{- define "microblog.labels" -}}
-helm.sh/chart: {{ include "microblog.chart" . }}
-{{ include "microblog.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end }}
+{{- define "microblog.storageClass" -}}
+{{- include "common.storage.class" (dict "persistence" .Values.persistence "global" .Values.global) -}}
+{{- end -}}
 
 {{/*
-Selector labels
+Microblog credential secret name
 */}}
-{{- define "microblog.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "microblog.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "microblog.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "microblog.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-
+{{- define "microblog.secretName" -}}
+    {{- coalesce .Values.existingSecret (include "common.names.fullname" .) -}}
+{{- end -}}
 
 {{/*
 Return the MariaDB Hostname
@@ -120,7 +101,7 @@ Return the MariaDB Secret Name
 {{- else if .Values.externalDatabase.existingSecret -}}
     {{- printf "%s" .Values.externalDatabase.existingSecret -}}
 {{- else -}}
-    {{- printf "%s-%s" (include "common.names.fullname" .) "externaldb" -}}
+    {{- printf "%s-%s" (include "common.names.fullname" .) "external" -}}
 {{- end -}}
 {{- end -}}
 
@@ -129,35 +110,61 @@ Return the database password key
 */}}
 {{- define "microblog.databasePasswordKey" -}}
 {{- if .Values.mariadb.enabled -}}
-mariadb-password
+    mariadb-password
 {{- else -}}
-db-password
+    db-password
 {{- end -}}
 {{- end -}}
-
 
 {{/*
 Return the Redis Hostname
 */}}
 {{- define "microblog.redisHost" -}}
 {{- if .Values.redis.enabled }}
-    {{- if eq .Values.redis.architecture "replication" }}
-        {{- printf "%s-%s" (include "microblog.redis.fullname" .) "primary" | trunc 63 | trimSuffix "-" -}}
-    {{- else -}}
-        {{- printf "%s" (include "microblog.mariadb.fullname" .) -}}
+    {{- if and .Values.redis.cluster.enabled .Values.redis.sentinel.enabled }}
+        {{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}
+    {{- else }}
+        {{- printf "%s-%s-%s" .Release.Name "redis" "master" | trunc 63 | trimSuffix "-" -}}
     {{- end -}}
-{{- else -}}
-    {{- printf "%s" .Values.externalDatabase.host -}}
+{{- else }}
+    {{- printf "%s" .Values.externalRedis.host -}}
 {{- end -}}
 {{- end -}}
 
 {{/*
-Return the MariaDB Port
+Return the Redis Port
 */}}
-{{- define "microblog.databasePort" -}}
-{{- if .Values.mariadb.enabled }}
-    {{- printf "3306" -}}
+{{- define "microblog.redisPort" -}}
+{{- if .Values.redis.enabled }}
+    {{- if and .Values.redis.cluster.enabled .Values.redis.sentinel.enabled }}
+        {{- printf "%d" .Values.redis.sentinel.service.sentinelPort -}}
+    {{- else }}
+        {{- printf "%d" .Values.redis.master.service.port -}}
 {{- else -}}
-    {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
+    {{- printf "%d" (.Values.externalRedis.port | int ) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the Redis Secret Name
+*/}}
+{{- define "microblog.redisSecretName" -}}
+{{- if .Values.redis.enabled }}
+    {{- printf "%s" (include "microblog.redis.fullname" .) -}}
+{{- else if .Values.externalRedis.existingSecret -}}
+    {{- printf "%s" .Values.externalRedis.existingSecret -}}
+{{- else -}}
+    {{- printf "%s-%s" (include "common.names.fullname" .) "external" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the database password key
+*/}}
+{{- define "microblog.redisPasswordKey" -}}
+{{- if .Values.redis.enabled -}}
+    redis-password
+{{- else -}}
+    redis-password
 {{- end -}}
 {{- end -}}

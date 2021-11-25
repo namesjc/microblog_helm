@@ -6,7 +6,7 @@ microblog:
   replicaCount: 1
 
   image:
-    repository: nginx
+    repository: adiachan/microblog
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
@@ -38,6 +38,9 @@ microblog:
     # readOnlyRootFilesystem: true
     # runAsNonRoot: true
     # runAsUser: 1000
+
+  healthcheck:
+    enabled: true
 
   service:
     type: ClusterIP
@@ -86,29 +89,52 @@ microblog:
 
   affinity: {}
 
-  smtp:
-    host: mail
-    tls: true
-    starttls: true
-    auth:
-      enabled: false
-      user: ""
-      password: ""
-      # Note: sSMTP only supports LOGIN and CRAM-MD5
-      method: LOGIN
+## @param commonAnnotations Common annotations to add to all Drupal resources (sub-charts are not considered). Evaluated as a template
+##
+commonAnnotations: {}
+## @param commonLabels Common labels to add to all Drupal resources (sub-charts are not considered). Evaluated as a template
+##
+commonLabels: {}
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 8Gi
+  existingClaim: ""
+  hostPath: ""
+
+smtp:
+  smtpHost: ""
+  smtpPort: ""
+  smtpUser: ""
+  smtpPassword: ""
+  smtpProtocol: ""
 
 # Specify an external database
 # Useful for managed offerings from your Cloud Provider
-external:
+externalDatabase:
   enabled: false
-  # Drupal DB driver
-  driver: mysql
   port: 3306
   host: mysql.example.org
   # Credentials
   database: wxt
   user: wxt
   password: password
+  existingSecret: password
+
+externalRredis:
+  enabled: false
+  port: 3306
+  host: mysql.example.org
+  password: password
+  existingSecret: password
+
+externalElasticsearch:
+  enabled: false
+  elasticsearchPort: 9200
+  elasticsearchHost: mysql.example.org
+  elasticsearchPassword: ""
 
 mariadb:
   ## @param mariadb.enabled Whether to deploy a mariadb server to satisfy the applications database requirements
