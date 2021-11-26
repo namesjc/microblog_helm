@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ include "microblog.fullname" . }}-microblog
-  labels: 
+  labels:
     app.kubernetes.io/name: {{ include "microblog.name" . }}
     helm.sh/chart: {{ include "microblog.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -14,12 +14,12 @@ metadata:
   {{- end }}
 spec:
   {{- if .Values.persistence.hostPath }}
-  storageClassName: ""
+  storageClassName: {{ include "microblog.fullname" . }}-microblog
   {{- end }}
   accessModes:
     - {{ .Values.persistence.accessMode | quote }}
   resources:
     requests:
       storage: {{ .Values.persistence.size | quote }}
-  {{- include "drupal.storageClass" . | nindent 2 }}
+  {{- include "microblog.storageClass" . | nindent 2 }}
 {{- end -}}

@@ -34,7 +34,14 @@ Create chart name and version as used by the chart label.
 Return the proper Storage Class
 */}}
 {{- define "microblog.storageClass" -}}
-{{- include "common.storage.class" (dict "persistence" .Values.persistence "global" .Values.global) -}}
+{{- $storageClass := .Values.persistence.storageClass -}}
+{{- if $storageClass -}}
+  {{- if (eq "-" $storageClass) -}}
+      {{- printf "storageClassName: \"\"" -}}
+  {{- else }}
+      {{- printf "storageClassName: %s" $storageClass -}}
+  {{- end -}}
+{{- end -}}
 {{- end -}}
 
 {{/*
