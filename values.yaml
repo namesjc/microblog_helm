@@ -89,10 +89,10 @@ microblog:
 
   affinity: {}
 
-## @param commonAnnotations Common annotations to add to all Drupal resources (sub-charts are not considered). Evaluated as a template
+## @param commonAnnotations Common annotations to add to all Microblog resources (sub-charts are not considered). Evaluated as a template
 ##
 commonAnnotations: {}
-## @param commonLabels Common labels to add to all Drupal resources (sub-charts are not considered). Evaluated as a template
+## @param commonLabels Common labels to add to all Microblog resources (sub-charts are not considered). Evaluated as a template
 ##
 commonLabels: {}
 
@@ -103,6 +103,8 @@ persistence:
   size: 8Gi
   existingClaim: ""
   hostPath: ""
+  annotations: {}
+  labels: {}
 
 smtp:
   smtpHost: ""
