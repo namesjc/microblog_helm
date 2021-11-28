@@ -15,13 +15,11 @@ spec:
     matchLabels:
       app.kubernetes.io/name: {{ include "microblog.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
-      tier: microblog
   template:
     metadata:
       labels:
         app.kubernetes.io/name: {{ include "microblog.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
-        tier: microblog
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
@@ -89,11 +87,11 @@ spec:
                   name: {{ include "microblog.redisSecretName" . }}
                   key: {{ include "microblog.redisPasswordKey" . | quote }}
             - name: ELASTICSEARCH_URL
-              value: {{ .Values.external_elasticsearch.elasticsearchHost | quote }}
+              value: {{ .Values.externalElasticsearch.elasticsearchHost | quote }}
             - name: ELASTICSEARCH_PORT
-              value: {{ .Values.external_elasticsearch.elasticsearchPort | quote }}
-            - name: MICROBLOG_EMAIL
-              value: {{ .Values.Email | quote }}
+              value: {{ .Values.externalElasticsearch.elasticsearchPort | quote }}
+            - name: MAIL_USERNAME
+              value: {{ .Values.smtp.mailUsername | quote }}
             {{- if .Values.smtp.smtpHost }}
             - name: SMTP_HOST
               value: {{ .Values.smtp.smtpHost | quote }}
@@ -110,7 +108,7 @@ spec:
             - name: SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "microblog.secretName" . }}
+                  name: {{ include "microblog.fullname" . }}
                   key: smtp-password
             {{- end }}
             {{- if .Values.microblog.smtpProtocol }}

@@ -3,7 +3,10 @@ kind: Pod
 metadata:
   name: "{{ include "microblog.fullname" . }}-test-connection"
   labels:
-    {{- include "microblog.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ include "microblog.name" . }}
+    helm.sh/chart: {{ include "microblog.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -11,5 +14,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "microblog.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "microblog.fullname" . }}:{{ .Values.microblog.service.port }}']
   restartPolicy: Never

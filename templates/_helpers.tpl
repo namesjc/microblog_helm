@@ -23,6 +23,14 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{- define "microblog.mariadb.fullname" -}}
+{{- printf "%s-%s" .Release.Name "mariadb" | trunc 63 | trimSuffix "-"  -}}
+{{- end }}
+
+{{- define "microblog.redis.fullname" -}}
+{{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-"  -}}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
@@ -42,13 +50,6 @@ Return the proper Storage Class
       {{- printf "storageClassName: %s" $storageClass -}}
   {{- end -}}
 {{- end -}}
-{{- end -}}
-
-{{/*
-Microblog credential secret name
-*/}}
-{{- define "microblog.secretName" -}}
-    {{- coalesce .Values.existingSecret (include "common.names.fullname" .) -}}
 {{- end -}}
 
 {{/*
@@ -108,7 +109,7 @@ Return the MariaDB Secret Name
 {{- else if .Values.externalDatabase.existingSecret -}}
     {{- printf "%s" .Values.externalDatabase.existingSecret -}}
 {{- else -}}
-    {{- printf "%s-%s" (include "common.names.fullname" .) "external" -}}
+    {{- printf "%s-%s" (include "microblog.fullname" .) "external" -}}
 {{- end -}}
 {{- end -}}
 
@@ -128,7 +129,7 @@ Return the Redis Hostname
 */}}
 {{- define "microblog.redisHost" -}}
 {{- if .Values.redis.enabled }}
-    {{- if and .Values.redis.cluster.enabled .Values.redis.sentinel.enabled }}
+    {{- if .Values.redis.sentinel.enabled }}
         {{- printf "%s-%s" .Release.Name "redis" | trunc 63 | trimSuffix "-" -}}
     {{- else }}
         {{- printf "%s-%s-%s" .Release.Name "redis" "master" | trunc 63 | trimSuffix "-" -}}
@@ -143,10 +144,11 @@ Return the Redis Port
 */}}
 {{- define "microblog.redisPort" -}}
 {{- if .Values.redis.enabled }}
-    {{- if and .Values.redis.cluster.enabled .Values.redis.sentinel.enabled }}
-        {{- printf "%d" .Values.redis.sentinel.service.sentinelPort -}}
+    {{- if .Values.redis.sentinel.enabled }}
+        {{- printf "%d" (.Values.redis.sentinel.service.sentinelPort | int ) -}}
     {{- else }}
-        {{- printf "%d" .Values.redis.master.service.port -}}
+        {{- printf "%d" (.Values.redis.master.service.port | int ) -}}
+    {{- end -}}
 {{- else -}}
     {{- printf "%d" (.Values.externalRedis.port | int ) -}}
 {{- end -}}
@@ -161,7 +163,7 @@ Return the Redis Secret Name
 {{- else if .Values.externalRedis.existingSecret -}}
     {{- printf "%s" .Values.externalRedis.existingSecret -}}
 {{- else -}}
-    {{- printf "%s-%s" (include "common.names.fullname" .) "external" -}}
+    {{- printf "%s-%s" (include "microblog.fullname" .) "external" -}}
 {{- end -}}
 {{- end -}}
 

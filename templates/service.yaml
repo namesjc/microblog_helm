@@ -1,13 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: { { include "microblog.fullname" . } }
-  labels: { { - include "microblog.labels" . | nindent 4 } }
+  name: {{ include "microblog.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "microblog.name" . }}
+    helm.sh/chart: {{ include "microblog.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-  type: { { .Values.microblog.service.type } }
+  type: {{ .Values.microblog.service.type }}
   ports:
-    - port: { { .Values.microblog.service.port } }
+    - port: {{ .Values.microblog.service.port }}
       targetPort: http
       protocol: TCP
       name: http
-  selector: { { - include "microblog.selectorLabels" . | nindent 4 } }
+  selector:
+    app.kubernetes.io/name: {{ include "microblog.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
