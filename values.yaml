@@ -117,27 +117,29 @@ smtp:
 # Specify an external database
 # Useful for managed offerings from your Cloud Provider
 externalDatabase:
-  enabled: false
   port: 3306
-  host: mysql.example.org
+  host: ""
   # Credentials
-  database: wxt
-  user: wxt
-  password: password
-  existingSecret: password
+  database: ""
+  user: ""
+  password: ""
+  existingSecret: ""
 
 externalRedis:
-  enabled: false
-  port: 3306
-  host: mysql.example.org
-  password: password
-  existingSecret: password
+  port: 6379
+  host: ""
+  password: ""
+  existingSecret: ""
 
+## External elasticsearch configuration
+##
 externalElasticsearch:
-  enabled: false
-  elasticsearchPort: 9200
-  elasticsearchHost: mysql.example.org
-  elasticsearchPassword: ""
+  ## @param externalElasticsearch.host Host of the external elasticsearch server
+  ##
+  host: ""
+  ## @param externalElasticsearch.port Port of the external elasticsearch server
+  ##
+  port: 9200
 
 mariadb:
   ## @param mariadb.enabled Whether to deploy a mariadb server to satisfy the applications database requirements
@@ -232,29 +234,32 @@ redis:
   metrics:
     enabled: true
 
+## @section Elasticsearch parameters
+
+## Elasticsearch chart configuration
+## https://github.com/bitnami/charts/blob/master/bitnami/elasticsearch/values.yaml
+##
 elasticsearch:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: bitnami/elasticsearch
-    tag: 7.15.2-debian-10-r0
+  ## @param elasticsearch.enabled Whether to deploy a elasticsearch server to use as magento's search engine
+  ## To use an external server set this to false and configure the externalElasticsearch parameters
+  ##
+  enabled: true
+  ## @param elasticsearch.sysctlImage.enabled Enable kernel settings modifier image for Elasticsearch
+  ##
+  sysctlImage:
+    enabled: true
+  ## Elasticsearch master-eligible node parameters
+  ## @param elasticsearch.master.replicas Desired number of Elasticsearch master-eligible nodes
+  ##
   master:
     replicas: 1
-    persistence:
-      enabled: true
-      storageClass: ""
-
-  ## X-Pack security parameters
-  ## Note: TLS configuration is required in order to configure password authentication
+  ## Elasticsearch coordinating-only node parameters
+  ## @param elasticsearch.coordinating.replicas Desired number of Elasticsearch coordinating-only nodes
   ##
-  security:
-    ## @param security.enabled Enable X-Pack Security settings
-    ##
-    enabled: false
-    ## @param security.elasticPassword Password for 'elastic' user
-    ## Ref: https://github.com/bitnami/bitnami-docker-elasticsearch#security
-    ##
-    elasticPassword: ""
-    ## @param security.existingSecret Name of the existing secret containing the Elasticsearch password
-    ##
-    existingSecret: ""
+  coordinating:
+    replicas: 1
+  ## Elasticsearch data node parameters
+  ## @param elasticsearch.data.replicas Desired number of Elasticsearch data nodes
+  ##
+  data:
+    replicas: 1
