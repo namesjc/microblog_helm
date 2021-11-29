@@ -44,7 +44,7 @@ microblog:
 
   service:
     type: ClusterIP
-    port: 80
+    port: 5000
 
   ingress:
     enabled: false
@@ -177,7 +177,7 @@ mariadb:
     ## @param mariadb.primary.persistence.existingClaim Name of an existing `PersistentVolumeClaim` for MariaDB primary replicas
     ##
     persistence:
-      enabled: true
+      enabled: false
       ## mariadb data Persistent Volume Storage Class
       ## If defined, storageClassName: <storageClass>
       ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -188,7 +188,7 @@ mariadb:
       storageClass: ""
       accessModes:
         - ReadWriteOnce
-      size: 8Gi
+      size: 2Gi
       hostPath: ""
       existingClaim: ""
 

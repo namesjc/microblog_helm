@@ -182,10 +182,6 @@ Return the database password key
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "microblog.elasticsearch.fullname" -}}
-{{- printf "%s-%s-coordinating-only" .Release.Name "elasticsearch" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
 {{- define "microblog.elasticsearchHost" -}}
 {{- if .Values.elasticsearch.enabled }}
     {{- printf "%s-%s-coordinating-only" .Release.Name "elasticsearch" | trunc 63 | trimSuffix "-" -}}
@@ -195,11 +191,11 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Return the Redis Port
+Return the Elasticsearch Port
 */}}
 {{- define "microblog.elasticsearchPort" -}}
 {{- if .Values.elasticsearch.enabled }}
-    {{- printf "3306" -}}
+    {{- printf "9200" -}}
 {{- else -}}
     {{- printf "%d" (.Values.externalelasticsearch.port | int ) -}}
 {{- end -}}
