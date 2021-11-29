@@ -5,7 +5,7 @@ entries:
       category: Infrastructure
     apiVersion: v2
     appVersion: 1.10.0
-    created: "2021-11-29T23:58:21.854380774+08:00"
+    created: "2021-11-30T00:09:10.418736843+08:00"
     description: A Library Helm Chart for grouping common logic between bitnami charts.
       This chart is not deployable by itself.
     digest: d13f6834adeb4d8d9cf94d2149680b08006543ab88944192f236decebd6313ae
@@ -26,14 +26,14 @@ entries:
     - http://www.bitnami.com/
     type: library
     urls:
-    - common-1.10.1.tgz
+    - charts/common-1.10.1.tgz
     version: 1.10.1
   elasticsearch:
   - annotations:
       category: Analytics
     apiVersion: v2
     appVersion: 7.15.2
-    created: "2021-11-29T23:58:21.865250842+08:00"
+    created: "2021-11-30T00:09:10.437472302+08:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -58,14 +58,14 @@ entries:
     - https://github.com/bitnami/bitnami-docker-elasticsearch
     - https://www.elastic.co/products/elasticsearch
     urls:
-    - elasticsearch-17.3.3.tgz
+    - charts/elasticsearch-17.3.3.tgz
     version: 17.3.3
   mariadb:
   - annotations:
       category: Database
     apiVersion: v2
     appVersion: 10.5.13
-    created: "2021-11-29T23:58:21.869285965+08:00"
+    created: "2021-11-30T00:09:10.444950736+08:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -94,14 +94,43 @@ entries:
     - https://github.com/prometheus/mysqld_exporter
     - https://mariadb.org
     urls:
-    - mariadb-9.8.1.tgz
+    - charts/mariadb-9.8.1.tgz
     version: 9.8.1
+  microblog:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2021-11-30T00:09:10.489648903+08:00"
+    dependencies:
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      version: 15.x.x
+    - condition: mariadb.enabled
+      name: mariadb
+      repository: https://charts.bitnami.com/bitnami
+      version: 9.x.x
+    - condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://charts.bitnami.com/bitnami
+      version: 17.x.x
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: A Helm chart for microblog with mariadb,redis intergrated.
+    digest: a5b6b9bd27de1cd53d534e1066d28e5d8d717d37d686dd98508e5c30a834208b
+    name: microblog
+    type: application
+    urls:
+    - charts/microblog-0.1.0.tgz
+    version: 0.1.0
   redis:
   - annotations:
       category: Database
     apiVersion: v2
     appVersion: 6.2.6
-    created: "2021-11-29T23:58:21.877449096+08:00"
+    created: "2021-11-30T00:09:10.497215208+08:00"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -128,6 +157,6 @@ entries:
     - https://github.com/bitnami/bitnami-docker-redis
     - http://redis.io/
     urls:
-    - redis-15.6.2.tgz
+    - charts/redis-15.6.2.tgz
     version: 15.6.2
-generated: "2021-11-29T23:58:21.849569548+08:00"
+generated: "2021-11-30T00:09:10.417290866+08:00"
